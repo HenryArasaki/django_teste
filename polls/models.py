@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 # Create your models here.
 
 
@@ -31,10 +32,16 @@ class Cidade(models.Model):
     def __str__(self):
         return self.nome
 
+def valid_ip(ip):
+    if ip == "1.1.1.1":
+        raise ValidationError(str(ip) + " é um IP inválido")
 
 class Equipamento(models.Model):
     nome = models.CharField(max_length=50)
-    ip = models.GenericIPAddressField()
+    ip = models.GenericIPAddressField(validators=[valid_ip])
     cidade = models.ForeignKey(Cidade, on_delete=models.CASCADE)
     def __str__(self):
         return self.nome
+    def numero_de_caracteres_do_ip(self):
+        tamanho = len(self.ip) - 3
+        return tamanho
